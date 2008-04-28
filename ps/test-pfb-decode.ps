@@ -1,21 +1,36 @@
 %!
-% Exercise /PDFDecode filter including the newly added feature that treats
-% the text after empty ASCII block as ASCII stream terminated by 0x80
-% character, a presumed header of the next block.
+% Exercise /PFBDecode filter including the newly added feature that 
+% treats the text after empty ASCII block as ASCII stream terminated 
+% by the 0x80 character, a presumed header of the next block.
+
+% <string> say -
+% print a result to both the page and the terminal
+/Times-Roman findfont 12 scalefont setfont
+/linestart 600 def
+/say {
+ dup 
+ 50 linestart moveto	% draw the message on the screen
+ show
+ linestart 24 sub	% advance the line pointer for next time
+ /linestart exch def
+ ==			% print the message to terminal
+} bind def
+(Testing the /PFBDecode filter) say
 
 product (Ghostscript) search not {
   pop
-  (Ghostscript-specific test is skipped.) ==
+  (Ghostscript-specific test is skipped.) say
   currentfile flushfile
 } if
 pop pop pop
 
 /test {
   dup cvx exec not {
-    (Check failed:) =
+    (Check failed:) say
     ==
     ()= 
   } {
+    (Check ok.) say
     pop
   } ifelse
 } bind def
@@ -35,3 +50,6 @@ pop pop pop
 
 {src false /PFBDecode filter =string readstring pop (0123) eq}   test
 {src true  /PFBDecode filter =string readstring pop (01233) eq}  test
+
+% output a page so we don't confuse test harnesses
+showpage
